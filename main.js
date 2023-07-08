@@ -1,6 +1,6 @@
 // Base axios
 let axiosBase = axios.create({
-  baseURL: "https://crudcrud.com/api/80324dd4bf544f1e8a4614af5e59526a",
+  baseURL: "https://crudcrud.com/api/5040e8f402724c878d98628972d89d78",
 });
 
 // Onload Candy Added from Server
@@ -22,6 +22,7 @@ window.addEventListener("DOMContentLoaded", () => {
 let form = document.getElementById("candyForm");
 form.addEventListener("submit", addCandy);
 let candyList = document.getElementById("candyList");
+candyList.style.textTransform = "capitalize";
 candyList.addEventListener("click", buyFunction);
 
 // Document Variables
@@ -46,7 +47,8 @@ function addCandy(e) {
   axiosBase
     .post("/candyInventory", candyObject)
     .then((res) => {
-      makeList(res);
+      makeList(res.data);
+      console.log(res);
     })
     .catch((error) => {
       console.log(error);
@@ -61,7 +63,7 @@ function makeList(res) {
   <button class="btn btn-danger btn-sm fw-semibold float-end buy-3" id="buy-3">Buy 3</button>
   <button class="btn btn-warning btn-sm fw-semibold float-end ms-2 me-2 buy-2" id="buy-2">Buy 2</button>
   <button class="btn btn-success btn-sm fw-semibold float-end buy-1" id="buy-1">Buy 1</button>
-  <button class="btn btn-outline-primary btn-sm fw-semibold float-end me-2">${res.candyQuantity}</button>`;
+  <button class="btn btn-outline-primary btn-sm fw-semibold float-end me-2 quantity">${res.candyQuantity}</button>`;
   li.id = res._id;
   candyList.appendChild(li);
 }
@@ -70,21 +72,75 @@ function makeList(res) {
 function buyFunction(e) {
   if (e.target.classList.contains("buy-3")) {
     let li = e.target.parentNode;
-    axiosBase.get(`/candyInventory/${li.id}`).then((res) => {
-      candySubtraction(res, 3);
-    });
+    let candyName;
+    let candyDescription;
+    let candyPrice;
+    let candyQuantity;
+    axiosBase
+      .get(`/candyInventory/${li.id}`)
+      .then((res) => {
+        candyName = res.data.candyName;
+        candyDescription = res.data.candyDescription;
+        candyPrice = res.data.candyPrice;
+        candyQuantity = res.data.candyQuantity - 3;
+      })
+      .then(() => {
+        li.children[4].innerHTML = candyQuantity;
+        axiosBase.put(`/candyInventory/${li.id}`, {
+          candyName: candyName,
+          candyDescription: candyDescription,
+          candyPrice: candyPrice,
+          candyQuantity: candyQuantity,
+        });
+      });
   }
   if (e.target.classList.contains("buy-2")) {
     let li = e.target.parentNode;
-    axiosBase.get(`/candyInventory/${li.id}`).then((res) => {
-      candySubtraction(res, 2);
-    });
+    let candyName;
+    let candyDescription;
+    let candyPrice;
+    let candyQuantity;
+    axiosBase
+      .get(`/candyInventory/${li.id}`)
+      .then((res) => {
+        candyName = res.data.candyName;
+        candyDescription = res.data.candyDescription;
+        candyPrice = res.data.candyPrice;
+        candyQuantity = res.data.candyQuantity - 2;
+      })
+      .then(() => {
+        li.children[4].innerHTML = candyQuantity;
+        axiosBase.put(`/candyInventory/${li.id}`, {
+          candyName: candyName,
+          candyDescription: candyDescription,
+          candyPrice: candyPrice,
+          candyQuantity: candyQuantity,
+        });
+      });
   }
   if (e.target.classList.contains("buy-1")) {
     let li = e.target.parentNode;
-    axiosBase.get(`/candyInventory/${li.id}`).then((res) => {
-      candySubtraction(res, 1);
-    });
+    let candyName;
+    let candyDescription;
+    let candyPrice;
+    let candyQuantity;
+    axiosBase
+      .get(`/candyInventory/${li.id}`)
+      .then((res) => {
+        candyName = res.data.candyName;
+        candyDescription = res.data.candyDescription;
+        candyPrice = res.data.candyPrice;
+        candyQuantity = res.data.candyQuantity - 1;
+      })
+      .then(() => {
+        li.children[4].innerHTML = candyQuantity;
+        axiosBase.put(`/candyInventory/${li.id}`, {
+          candyName: candyName,
+          candyDescription: candyDescription,
+          candyPrice: candyPrice,
+          candyQuantity: candyQuantity,
+        });
+      });
   }
 }
 
@@ -93,12 +149,11 @@ function candySubtraction(res, minus) {
   let candyObject = res.data;
   let number = candyObject.candyQuantity - minus;
   candyObject.candyQuantity = number.toString();
-  // axiosBase
-  //   .put(`/candyInventory/${candyObject._id}`, candyObject)
-  //   .then((res) => {
-  //     console.log(res);
-  //   })
-  //   .catch((error) => {
-  //     console.log(error);
-  //   });
 }
+
+// axiosBase.patch("/candyInventory/64a9a588c632b703e8309ffb", {
+// candyName: "candyName",
+// candyDescription: "candyDescription",
+// candyPrice: "55",
+// candyQuantity: "120",
+// });
